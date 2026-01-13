@@ -1,12 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/.next",
+  "framework": "nextjs",
   "env": {
-    "GROQ_API_KEY": "@groq_api_key"
-  }
+    "GROQ_API_KEY": "@groq_api_key",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "SECRET_KEY": "@secret_key"
+  },
+  "rewrites": [
+    {
+      "source": "/api/backend/:path*",
+      "destination": "/api/backend/:path*"
+    }
+  ]
 }

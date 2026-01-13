@@ -1,9 +1,9 @@
-# 🚀 Deployment Guide - Talentra to Vercel
+# 🚀 Deployment Guide - Talentra on Vercel
 
 ## Quick Summary
 
-✅ **Frontend + Backend**: Both deploy together on Vercel (no separate backend server needed)
-✅ **Database**: No database required for basic functionality (can add Supabase later)
+✅ **Frontend + Backend**: Both deploy together on Vercel (serverless)
+✅ **Database**: No database required for basic functionality
 ✅ **Cost**: Free tier available on Vercel
 ✅ **Time**: 5-10 minutes to deploy
 
@@ -19,90 +19,98 @@
 
 ## 🎯 Step-by-Step Deployment
 
-### Step 1: Prepare Your Repository
+### Step 1: Rotate Your API Key (CRITICAL)
+
+⚠️ **Before deploying, rotate your exposed GROQ API key:**
+
+1. Go to https://console.groq.com/keys
+2. Delete/revoke the old key
+3. Create a new API key and save it
+
+### Step 2: Prepare Your Repository
 
 ```bash
 # Navigate to your project
 cd d:\github\c
 
-# Ensure everything is committed
-git status
+# Remove the exposed .env.local from Git tracking
+git rm --cached frontend/.env.local
 
-# If you have uncommitted changes:
+# Commit the changes
 git add .
-git commit -m "Ready for deployment"
+git commit -m "Prepare for Vercel deployment"
 git push origin main
 ```
 
-### Step 2: Connect to Vercel
+### Step 3: Connect to Vercel
 
 1. Go to **https://vercel.com**
 2. Click **"Sign Up"** or **"Log In"**
 3. Connect with your GitHub account
 4. Click **"New Project"**
 
-### Step 3: Import Your Repository
+### Step 4: Import Your Repository
 
 1. Find your repository `AnshXGrind/c` in the list
 2. Click **"Import"**
 
-### Step 4: Configure Project Settings
+### Step 5: Configure Project Settings
 
-**IMPORTANT**: Vercel will auto-detect settings from `vercel.json`, but verify:
+**IMPORTANT**: Set these values:
 
 #### Root Directory
 ```
 frontend
 ```
-⚠️ **This is critical!** Set this to `frontend` in Vercel project settings if not auto-detected.
+⚠️ **Critical!** Set Root Directory to `frontend`
 
 #### Framework Preset
-```
-Next.js
-```
+Vercel will auto-detect: `Next.js`
 
-#### Build & Development Settings
-Vercel will automatically use the settings from your `vercel.json` file
+#### Build Settings
+- Build Command: `npm run build` (auto-detected)
+- Output Directory: `.next` (auto-detected)
+- Install Command: `npm install` (auto-detected)
 
-### Step 5: Add Environment Variables
+### Step 6: Add Environment Variables
 
-**Critical Step for GROQ_API_KEY:**
+**Critical Step - Add Your NEW API Key:**
 
-1. Click **"Environment Variables"** in Vercel project settings
-2. Add your Groq API key:
+Click **"Environment Variables"** and add:
 
 | Name | Value |
 |------|-------|
-| `GROQ_API_KEY` | `your_actual_groq_api_key_from_console.groq.com` |
+| `GROQ_API_KEY` | `your_NEW_groq_api_key_here` |
 
-3. Make sure to add it for all environments (Production, Preview, Development)
+⚠️ **IMPORTANT**: 
+- Use your NEW rotated key from console.groq.com
+- Add it for all environments: Production, Preview, Development
+- Click "Add" after entering each variable
 
-Get your Groq API key from: https://console.groq.com/keys
-
-⚠️ **Important**: Do NOT use the `@groq_api_key` syntax - paste your actual API key directly.
-
-### Step 6: Deploy!
+### Step 7: Deploy!
 
 1. Click **"Deploy"**
 2. Wait 2-3 minutes for build to complete
 3. ✅ Your app is live!
 
-### Step 7: Get Your URL
+### Step 8: Verify Deployment
 
-Vercel will provide:
-```
-https://your-project-name.vercel.app
-```
+Your Vercel URL will be: `https://your-project-name.vercel.app`
 
-You can customize the domain in **Project Settings > Domains**
+Test these endpoints:
+- **Homepage**: `https://your-project-name.vercel.app/`
+- **API Health**: `https://your-project-name.vercel.app/api/health` (if backend is used)
+- **Resume Analysis**: Use the web interface
 
 ---
 
-## 🔧 Post-Deployment Configuration
+## 🔧 Post-Deployment
 
-### Update API URLs (if needed)
+### Custom Domain (Optional)
 
-If you want to use a custom domain, update:
+1. Go to Project Settings → Domains
+2. Add your custom domain
+3. Follow DNS configuration steps
 
 **File**: `frontend/next.config.js`
 ```javascript
