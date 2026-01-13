@@ -1,0 +1,5 @@
+{
+  "/api/analyze-resume/route": "app/api/analyze-resume/route.js",
+  "/analyze/page": "app/analyze/page.js",
+  "/api/extract-text/route": "app/api/extract-text/route.js"
+}

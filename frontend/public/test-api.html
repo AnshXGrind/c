@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Resume Analyzer</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        button { padding: 10px 20px; background: #0070f3; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #0051cc; }
+        textarea { width: 100%; height: 200px; padding: 10px; margin-top: 10px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Test Resume Analyzer API</h1>
+    
+    <div>
+        <label>Resume Text:</label>
+        <textarea id="resumeText" placeholder="Paste sample resume text here...">John Doe
+Software Engineer
+
+EXPERIENCE
+Senior Software Engineer at Tech Corp (2020-2023)
+- Led development of microservices architecture
+- Improved system performance by 40%
+- Mentored junior developers
+
+SKILLS
+JavaScript, React, Node.js, Python, AWS
+
+EDUCATION
+B.S. Computer Science, University of Tech, 2020</textarea>
+    </div>
+
+    <div>
+        <label>Job Role:</label>
+        <select id="jobRole">
+            <option value="Software Development Engineer">Software Development Engineer</option>
+            <option value="Frontend Developer">Frontend Developer</option>
+            <option value="Backend Developer">Backend Developer</option>
+        </select>
+    </div>
+
+    <button onclick="testAPI()">Test API</button>
+    
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            const resumeText = document.getElementById('resumeText').value;
+            const role = document.getElementById('jobRole').value;
+
+            resultDiv.innerHTML = '<p>Testing API...</p>';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/analyze-resume', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ resumeText, role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✓ API is working!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">✗ API returned error:</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">✗ Failed to connect to API:</p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
