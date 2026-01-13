@@ -48,13 +48,13 @@ git push origin main
 
 ### Step 4: Configure Project Settings
 
-**IMPORTANT**: Update these settings before deploying:
+**IMPORTANT**: Vercel will auto-detect settings from `vercel.json`, but verify:
 
 #### Root Directory
 ```
 frontend
 ```
-⚠️ **This is critical!** The root of your Next.js app is in the `frontend` folder.
+⚠️ **This is critical!** Set this to `frontend` in Vercel project settings if not auto-detected.
 
 #### Framework Preset
 ```
@@ -62,19 +62,24 @@ Next.js
 ```
 
 #### Build & Development Settings
-- **Build Command**: `npm run build` (default)
-- **Output Directory**: `.next` (default)
-- **Install Command**: `npm install` (default)
+Vercel will automatically use the settings from your `vercel.json` file
 
 ### Step 5: Add Environment Variables
 
-Click **"Environment Variables"** and add:
+**Critical Step for GROQ_API_KEY:**
+
+1. Click **"Environment Variables"** in Vercel project settings
+2. Add your Groq API key:
 
 | Name | Value |
 |------|-------|
-| `GROQ_API_KEY` | `your_groq_api_key_here` |
+| `GROQ_API_KEY` | `your_actual_groq_api_key_from_console.groq.com` |
+
+3. Make sure to add it for all environments (Production, Preview, Development)
 
 Get your Groq API key from: https://console.groq.com/keys
+
+⚠️ **Important**: Do NOT use the `@groq_api_key` syntax - paste your actual API key directly.
 
 ### Step 6: Deploy!
 
