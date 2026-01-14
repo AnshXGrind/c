@@ -5,45 +5,41 @@ const PYTHON_ML_SERVICE = process.env.PYTHON_ML_SERVICE_URL || 'http://localhost
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File
-    const jobRole = formData.get('job_role') as string
+    const body = await request.json()
+    const { targetRole, currentSkills, targetSkills, timeframe } = body
 
     // Validate input
-    if (!file) {
+    if (!targetRole || !currentSkills || !targetSkills) {
       return NextResponse.json(
-        { error: 'Resume file is required' },
-        { status: 400 }
-      )
-    }
-
-    if (!jobRole || typeof jobRole !== 'string') {
-      return NextResponse.json(
-        { error: 'Job role is required' },
+        { error: 'Target role, current skills, and target skills are required' },
         { status: 400 }
       )
     }
 
     // Forward request to Python ML service
-    const mlFormData = new FormData()
-    mlFormData.append('file', file)
-    mlFormData.append('job_role', jobRole)
-
-    const response = await fetch(`${PYTHON_ML_SERVICE}/api/analyze`, {
+    const response = await fetch(`${PYTHON_ML_SERVICE}/api/roadmap`, {
       method: 'POST',
-      body: mlFormData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        target_role: targetRole,
+        current_skills: currentSkills,
+        target_skills: targetSkills,
+        timeframe: timeframe || 90,
+      }),
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'ML service error' }))
       return NextResponse.json(
-        { error: errorData.error || 'Failed to analyze resume' },
+        { error: errorData.error || 'Failed to generate roadmap' },
         { status: response.status }
       )
     }
 
-    const analysisResult = await response.json()
-    return NextResponse.json(analysisResult)
+    const result = await response.json()
+    return NextResponse.json(result)
 
   } catch (error) {
     console.error('API Gateway error:', error)

@@ -1,12 +1,11 @@
 services:
   - type: web
-    name: careerai-backend
+    name: careerai-ml-service
     repo: https://github.com/AnshXGrind/c
     branch: main
     root: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     env:
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
       SECRET_KEY: ${SECRET_KEY}
-      GROQ_API_KEY: ${GROQ_API_KEY}
+

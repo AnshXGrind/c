@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+// Use Next.js API routes as gateway (deployed to Vercel)
+// API routes will forward requests to Python ML Service (Render/Fly.io)
 
 // Types
 export interface SectionFeedback {
@@ -93,7 +94,8 @@ export async function analyzeResume(file: File, jobRole: string): Promise<Resume
   formData.append('job_role', jobRole)
 
   try {
-    const response = await fetch(`${API_URL}/api/analyze`, {
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch('/api/analyze-resume', {
       method: 'POST',
       body: formData,
     })
@@ -113,10 +115,11 @@ export async function analyzeResume(file: File, jobRole: string): Promise<Resume
 export async function getSkillsGap(file: File, jobRole: string): Promise<SkillsGapAnalysis> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('job_role', jobRole)
+  formData.append('target_role', jobRole)
 
   try {
-    const response = await fetch(`${API_URL}/api/skills-gap`, {
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch('/api/skills-gap', {
       method: 'POST',
       body: formData,
     })
@@ -132,9 +135,70 @@ export async function getSkillsGap(file: File, jobRole: string): Promise<SkillsG
   }
 }
 
+export async function compareResumes(
+  userResume: File,
+  sampleResume: File,
+  jobRole: string
+): Promise<any> {
+  const formData = new FormData()
+  formData.append('user_resume', userResume)
+  formData.append('sample_resume', sampleResume)
+  formData.append('job_role', jobRole)
+
+  try {
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch('/api/compare-resumes', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error('Comparison failed')
+    }
+
+    return response.json()
+  } catch (error) {
+    console.warn('API unavailable')
+    throw error
+  }
+}
+
+export async function generateRoadmap(
+  targetRole: string,
+  currentSkills: string[],
+  targetSkills: string[],
+  timeframe: number = 90
+): Promise<any> {
+  try {
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch('/api/roadmap', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        targetRole,
+        currentSkills,
+        targetSkills,
+        timeframe,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Roadmap generation failed')
+    }
+
+    return response.json()
+  } catch (error) {
+    console.warn('API unavailable')
+    throw error
+  }
+}
+
 export async function getSampleResumes(jobRole: string): Promise<SampleResume[]> {
   try {
-    const response = await fetch(`${API_URL}/api/samples/${jobRole}`)
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch(`/api/samples/${jobRole}`)
 
     if (!response.ok) {
       throw new Error('Failed to fetch samples')
@@ -149,7 +213,8 @@ export async function getSampleResumes(jobRole: string): Promise<SampleResume[]>
 
 export async function getJobMarketData(jobRole: string): Promise<JobMarketData> {
   try {
-    const response = await fetch(`${API_URL}/api/market/${jobRole}`)
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch(`/api/market-data?role=${encodeURIComponent(jobRole)}`)
 
     if (!response.ok) {
       throw new Error('Failed to fetch market data')
@@ -167,7 +232,8 @@ export async function generateCareerReport(
   skillsGap: SkillsGapAnalysis
 ): Promise<Blob> {
   try {
-    const response = await fetch(`${API_URL}/api/report`, {
+    // Call Next.js API Gateway (Vercel)
+    const response = await fetch('/api/report', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

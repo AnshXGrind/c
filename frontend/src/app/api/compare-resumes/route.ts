@@ -6,13 +6,14 @@ const PYTHON_ML_SERVICE = process.env.PYTHON_ML_SERVICE_URL || 'http://localhost
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const file = formData.get('file') as File
+    const userResume = formData.get('user_resume') as File
+    const sampleResume = formData.get('sample_resume') as File
     const jobRole = formData.get('job_role') as string
 
     // Validate input
-    if (!file) {
+    if (!userResume || !sampleResume) {
       return NextResponse.json(
-        { error: 'Resume file is required' },
+        { error: 'Both resume files are required' },
         { status: 400 }
       )
     }
@@ -26,10 +27,11 @@ export async function POST(request: NextRequest) {
 
     // Forward request to Python ML service
     const mlFormData = new FormData()
-    mlFormData.append('file', file)
+    mlFormData.append('user_resume', userResume)
+    mlFormData.append('sample_resume', sampleResume)
     mlFormData.append('job_role', jobRole)
 
-    const response = await fetch(`${PYTHON_ML_SERVICE}/api/analyze`, {
+    const response = await fetch(`${PYTHON_ML_SERVICE}/api/compare`, {
       method: 'POST',
       body: mlFormData,
     })
@@ -37,13 +39,13 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'ML service error' }))
       return NextResponse.json(
-        { error: errorData.error || 'Failed to analyze resume' },
+        { error: errorData.error || 'Failed to compare resumes' },
         { status: response.status }
       )
     }
 
-    const analysisResult = await response.json()
-    return NextResponse.json(analysisResult)
+    const result = await response.json()
+    return NextResponse.json(result)
 
   } catch (error) {
     console.error('API Gateway error:', error)

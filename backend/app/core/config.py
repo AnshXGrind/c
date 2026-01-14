@@ -15,16 +15,13 @@ class Settings(BaseSettings):
     PORT: int = 8000
     DEBUG: bool = True
     
-    # CORS
+    # CORS - Allow requests from Next.js frontend (Vercel)
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://*.vercel.app",
-        "*"  # Allow all origins for Vercel deployment
+        "*"  # Allow all origins for deployment
     ]
-    
-    # OpenAI
-    OPENAI_API_KEY: str = ""
     
     # Security
     SECRET_KEY: str = "your_secret_key_here_change_in_production"

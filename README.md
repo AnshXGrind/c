@@ -1,6 +1,20 @@
-# Talentra - AI-Powered Career Growth Platform
+# CareerAI - AI-Powered Career Growth Platform
 
 Transform your career with AI-powered resume analysis, skills gap identification, and personalized learning roadmaps.
+
+## 🎯 Architecture
+
+```
+Frontend (Next.js) ──────────▶ Vercel
+        │
+        │ REST API
+        ▼
+Backend Gateway (Next API) ──▶ Vercel
+        │
+        │ HTTP (JSON)
+        ▼
+Python ML Service ───────────▶ Render / Fly.io
+```
 
 ## 🚀 Features
 
@@ -12,92 +26,178 @@ Transform your career with AI-powered resume analysis, skills gap identification
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
-- **Backend**: Next.js API Routes (serverless)
-- **AI**: Groq API (llama-3.1-8b-instant)
-- **Deployment**: Vercel (Frontend + Backend together)
+### Frontend & API Gateway
+- **Framework**: Next.js 14, TypeScript, React
+- **Styling**: Tailwind CSS, shadcn/ui
+- **API Gateway**: Next.js API Routes (forwards to Python ML service)
+- **Deployment**: Vercel
 
-## 📦 Installation
+### Python ML Service
+- **Framework**: FastAPI, Python 3.11+
+- **NLP**: spaCy for text processing
+- **ML**: scikit-learn for analysis
+- **Parsing**: PyPDF2, python-docx
+- **Deployment**: Render or Fly.io
+
+## 📦 Installation & Setup
+
+### Option 1: Local Development (Full Stack)
+
+#### 1. Python ML Service
+
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+
+# Setup environment
+cp .env.example .env
+# Edit .env with your settings
+
+# Run ML service
+uvicorn main:app --reload --port 8000
+```
+
+Service runs at: http://localhost:8000
+API docs at: http://localhost:8000/docs
+
+#### 2. Frontend & API Gateway
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env.local
+# Edit .env.local:
+# PYTHON_ML_SERVICE_URL=http://localhost:8000
+
+# Run development server
+npm run dev
+```
+
+Frontend runs at: http://localhost:3000
+
+### Option 2: Frontend Only (Mock Data)
 
 ```bash
 cd frontend
 npm install
-```
-
-## 🔑 Environment Variables
-
-Create a `.env.local` file in the `frontend` directory:
-
-```env
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-Get your Groq API key from: https://console.groq.com
-
-## 🏃 Running Locally
-
-```bash
-cd frontend
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+The app will use mock data when Python ML service is unavailable.
 
-## 🚀 Deployment to Vercel
+## 🔑 Environment Variables
 
-### Prerequisites
-- Vercel account (free tier works)
-- GitHub repository
+### Frontend (.env.local)
+```env
+# Python ML Service URL
+PYTHON_ML_SERVICE_URL=http://localhost:8000
 
-### Step 1: Push to GitHub
-
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
+# App Config
+NEXT_PUBLIC_APP_NAME=CareerAI
 ```
 
-### Step 2: Deploy on Vercel
+### Backend (.env)
+```env
+# Server
+HOST=0.0.0.0
+PORT=8000
+DEBUG=true
 
-1. Go to [vercel.com](https://vercel.com)
-2. Click "New Project"
-3. Import your GitHub repository
-4. **Important Configuration**:
-   - **Root Directory**: Set to `frontend`
-   - **Framework Preset**: Next.js
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `.next`
+# CORS - Allow Vercel frontend
+CORS_ORIGINS=http://localhost:3000,https://*.vercel.app
 
-5. **Environment Variables**:
-   - Add `GROQ_API_KEY` with your Groq API key
+# Security
+SECRET_KEY=your_secret_key_change_in_production
+```
 
-6. Click "Deploy"
+## 🚀 Deployment
 
-### Step 3: Verify Deployment
+For complete deployment instructions, see [ARCHITECTURE.md](ARCHITECTURE.md)
 
-Once deployed, Vercel will provide you with:
-- Production URL: `https://your-app.vercel.app`
-- Automatic HTTPS
-- Automatic deployments on git push
+### Quick Deploy Summary
+
+#### 1. Deploy Python ML Service (Render)
+```bash
+# Push your code to GitHub
+
+# On Render:
+# - New Web Service
+# - Connect GitHub repo
+# - Root: backend
+# - Build: pip install -r requirements.txt && python -m spacy download en_core_web_sm
+# - Start: uvicorn main:app --host 0.0.0.0 --port $PORT
+# - Add env var: SECRET_KEY
+```
+
+#### 2. Deploy Frontend (Vercel)
+```bash
+# On Vercel:
+# - Import GitHub repo
+# - Root Directory: frontend
+# - Framework: Next.js
+# - Add env var: PYTHON_ML_SERVICE_URL=https://your-ml.onrender.com
+# - Deploy
+```
+
+#### 3. Connect Services
+Update Render CORS settings with your Vercel URL:
+```
+CORS_ORIGINS=https://your-app.vercel.app,https://*.vercel.app
+```
 
 ## 📁 Project Structure
 
 ```
-frontend/
-├── src/
+├── frontend/                    # Next.js Frontend & API Gateway
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── api/            # API Gateway routes
+│   │   │   │   ├── analyze-resume/
+│   │   │   │   ├── skills-gap/
+│   │   │   │   ├── compare-resumes/
+│   │   │   │   └── roadmap/
+│   │   │   ├── analyze/        # Resume analyzer page
+│   │   │   ├── skills/         # Skills gap page
+│   │   │   ├── roadmap/        # Career roadmap page
+│   │   │   └── compare/        # Resume comparison page
+│   │   ├── components/
+│   │   │   ├── ui/            # shadcn/ui components
+│   │   │   ├── layout/        # Navbar, Footer
+│   │   │   └── resume/        # Analyzer components
+│   │   └── lib/
+│   │       └── api.ts         # API client
+│   └── package.json
+│
+├── backend/                    # Python ML Service
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── analyze-resume/     # AI resume analysis endpoint
-│   │   │   └── extract-text/       # PDF/DOCX text extraction
-│   │   ├── analyze/                # Resume analyzer page
-│   │   ├── skills/                 # Skills gap page
-│   │   ├── roadmap/                # Career roadmap page
-│   │   └── compare/                # Resume comparison page
-│   ├── components/
-│   │   ├── ui/                     # shadcn/ui components
-│   │   ├── layout/                 # Navbar, Footer
-│   │   ├── sections/               # Landing page sections
-│   │   └── resume/                 # Resume analyzer components
+│   │   │   └── routes.py      # FastAPI endpoints
+│   │   ├── ml/
+│   │   │   ├── parser.py      # Resume parsing
+│   │   │   └── analyzer.py    # ML analysis
+│   │   ├── services/
+│   │   │   ├── analyzer_service.py
+│   │   │   ├── skills_service.py
+│   │   │   └── report_service.py
+│   │   └── core/
+│   │       └── config.py      # Configuration
+│   ├── main.py               # FastAPI app
+│   ├── requirements.txt
+│   └── render.yaml           # Render config
+│
+└── ARCHITECTURE.md           # Detailed architecture guide
+```
 │   └── lib/
 │       ├── resume-utils.ts         # Text extraction utilities
 │       └── api.ts                  # API client functions

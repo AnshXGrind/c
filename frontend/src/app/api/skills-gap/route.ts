@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File
-    const jobRole = formData.get('job_role') as string
+    const targetRole = formData.get('target_role') as string
 
     // Validate input
     if (!file) {
@@ -17,9 +17,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!jobRole || typeof jobRole !== 'string') {
+    if (!targetRole || typeof targetRole !== 'string') {
       return NextResponse.json(
-        { error: 'Job role is required' },
+        { error: 'Target role is required' },
         { status: 400 }
       )
     }
@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
     // Forward request to Python ML service
     const mlFormData = new FormData()
     mlFormData.append('file', file)
-    mlFormData.append('job_role', jobRole)
+    mlFormData.append('target_role', targetRole)
 
-    const response = await fetch(`${PYTHON_ML_SERVICE}/api/analyze`, {
+    const response = await fetch(`${PYTHON_ML_SERVICE}/api/skills-gap`, {
       method: 'POST',
       body: mlFormData,
     })
@@ -37,13 +37,13 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'ML service error' }))
       return NextResponse.json(
-        { error: errorData.error || 'Failed to analyze resume' },
+        { error: errorData.error || 'Failed to analyze skills gap' },
         { status: response.status }
       )
     }
 
-    const analysisResult = await response.json()
-    return NextResponse.json(analysisResult)
+    const result = await response.json()
+    return NextResponse.json(result)
 
   } catch (error) {
     console.error('API Gateway error:', error)
