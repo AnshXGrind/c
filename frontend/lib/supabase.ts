@@ -95,17 +95,29 @@ export async function deleteAnalysis(analysisId: string) {
   }
 }
 
-// Real-time listener for analyses
+// Real-time listener for analyses (Supabase v2 syntax)
 export function subscribeToAnalyses(
   userId: string,
   callback: (analysis: Analysis) => void
 ) {
-  return supabase
-    .from("analyses")
-    .on("*", (payload) => {
-      if (payload.new.user_id === userId) {
+  const channel = supabase
+    .channel('analyses-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'analyses',
+        filter: `user_id=eq.${userId}`
+      },
+      (payload) => {
         callback(payload.new as Analysis);
       }
-    })
+    )
     .subscribe();
+
+  // Return unsubscribe function
+  return () => {
+    supabase.removeChannel(channel);
+  };
 }
