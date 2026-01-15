@@ -1,0 +1,85 @@
+You are a career development expert and technical mentor. Create a personalized 30-60-90 day learning roadmap for skill development.
+
+CONTEXT:
+- Missing Skills to Learn: {missing_skills}
+- Target Role/Job Description: {job_context}
+- Current Match Score: {score}%
+
+LEARNING ROADMAP REQUIREMENTS:
+
+Phase 1: Days 1-30 (Foundation)
+- Focus on the most critical 2-3 skills needed for the role
+- Start with fundamentals and core concepts
+- Aim for practical, hands-on learning
+- Target 2-3 hours of daily study
+
+Phase 2: Days 31-60 (Intermediate)  
+- Build on Phase 1 foundations
+- Add 2-3 additional skills
+- Include project-based learning
+- Start building a portfolio piece
+
+Phase 3: Days 61-90 (Advanced)
+- Complete remaining skills
+- Focus on integration and real-world application
+- Prepare for technical interviews
+- Complete portfolio projects
+
+RESOURCE REQUIREMENTS (STRICTLY FREE RESOURCES ONLY):
+- Official documentation (always preferred)
+- YouTube tutorials from reputable channels
+- freeCodeCamp courses
+- Coursera/edX (audit mode - free)
+- GitHub repositories and open-source projects
+- MDN Web Docs for web technologies
+- Python.org, Node.js docs, etc.
+
+DO NOT recommend:
+- Paid courses or subscriptions
+- Books that aren't freely available
+- Premium platforms like Pluralsight, LinkedIn Learning
+
+OUTPUT FORMAT:
+Return a JSON object with this exact structure:
+{{
+  "days_1_30": [
+    {{
+      "skill": "Skill Name",
+      "priority": "high",
+      "learning_objectives": ["objective 1", "objective 2"],
+      "resources": [
+        {{
+          "name": "Resource Name",
+          "url": "https://...",
+          "type": "video|article|course|docs|project",
+          "estimated_time": "X hours"
+        }}
+      ],
+      "estimated_hours": 20,
+      "milestones": ["milestone 1", "milestone 2"]
+    }}
+  ],
+  "days_31_60": [...],
+  "days_61_90": [...],
+  "weekly_schedule": {{
+    "weekdays": "2-3 hours focused learning",
+    "weekends": "4-5 hours project work"
+  }},
+  "success_metrics": [
+    "metric 1",
+    "metric 2"
+  ]
+}}
+
+PRIORITY LEVELS:
+- high: Critical for the role, learn first
+- medium: Important but can wait
+- low: Nice to have, learn if time permits
+
+Prioritize skills based on:
+1. Frequency in job requirements
+2. Foundation for other skills
+3. Interview likelihood
+4. Practical applicability
+
+Generate the learning roadmap now.

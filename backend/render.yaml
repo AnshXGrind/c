@@ -1,11 +1,24 @@
 services:
   - type: web
-    name: careerai-ml-service
+    name: resume-intelligence-backend
     repo: https://github.com/AnshXGrind/c
     branch: main
     root: backend
-    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
-    env:
-      SECRET_KEY: ${SECRET_KEY}
+    buildCommand: pip install -r requirements-new.txt
+    startCommand: python -m uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: ENV
+        value: production
+      - key: LLM_PROVIDER
+        value: groq
+      - key: GROQ_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: FRONTEND_URL
+        value: https://resume-intelligence.vercel.app
+    healthCheckPath: /health
+    autoDeploy: true
 
