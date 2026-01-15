@@ -64,29 +64,11 @@ async function extractTextFromPDFBuffer(buffer: ArrayBuffer): Promise<string> {
   return result
 }
 
-// Alternative: Use Groq to extract text from base64 PDF
-async function extractWithAI(base64Data: string, apiKey: string): Promise<string> {
-  const Groq = (await import('groq-sdk')).default
-  const groq = new Groq({ apiKey })
-  
-  // For scanned PDFs, we'll ask the AI to help extract
-  const completion = await groq.chat.completions.create({
-    messages: [
-      {
-        role: 'user',
-        content: `The following is base64 encoded text content extracted from a PDF resume. Please clean it up and return only the readable resume text, properly formatted:
-
-${base64Data.substring(0, 8000)}
-
-Return only the clean resume text, no explanations.`
-      }
-    ],
-    model: 'llama-3.1-8b-instant',
-    temperature: 0.1,
-    max_tokens: 2000,
-  })
-  
-  return completion.choices[0]?.message?.content || ''
+// Alternative: Use backend API to extract text from complex PDFs
+async function extractWithBackend(buffer: ArrayBuffer): Promise<string> {
+  // This would call the backend API endpoint
+  // For now, fall back to basic extraction
+  return extractTextFromPDFBuffer(buffer)
 }
 
 export async function POST(request: NextRequest) {
