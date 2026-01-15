@@ -8,7 +8,7 @@ import re
 from typing import Optional
 from io import BytesIO
 
-import pdfplumber
+import PyPDF2
 from docx import Document
 
 
@@ -71,23 +71,16 @@ class ResumeParser:
         raise ValueError(f"Unsupported format: {ext}")
     
     def _extract_from_pdf(self, file_path: str) -> str:
-        """Extract text from a PDF file using pdfplumber."""
+        """Extract text from a PDF file using PyPDF2."""
         text_parts = []
         
         try:
-            with pdfplumber.open(file_path) as pdf:
-                for page in pdf.pages:
+            with open(file_path, 'rb') as file:
+                reader = PyPDF2.PdfReader(file)
+                for page in reader.pages:
                     page_text = page.extract_text()
                     if page_text:
                         text_parts.append(page_text)
-                    
-                    # Also extract text from tables
-                    tables = page.extract_tables()
-                    for table in tables:
-                        for row in table:
-                            if row:
-                                row_text = " | ".join(str(cell) if cell else "" for cell in row)
-                                text_parts.append(row_text)
         except Exception as e:
             raise RuntimeError(f"Failed to parse PDF: {str(e)}")
         
@@ -98,11 +91,11 @@ class ResumeParser:
         text_parts = []
         
         try:
-            with pdfplumber.open(BytesIO(content)) as pdf:
-                for page in pdf.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text_parts.append(page_text)
+            reader = PyPDF2.PdfReader(BytesIO(content))
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text_parts.append(page_text)
         except Exception as e:
             raise RuntimeError(f"Failed to parse PDF: {str(e)}")
         
