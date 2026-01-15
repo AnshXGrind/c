@@ -1,7 +1,7 @@
-"""
-Supabase Client for Frontend (React/Next.js)
-Install: npm install @supabase/supabase-js
-"""
+/**
+ * Supabase Client for Frontend (React/Next.js)
+ * Install: npm install @supabase/supabase-js
+ */
 
 import { createClient } from "@supabase/supabase-js";
 
